@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Archana Sweets Label Generator</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+label { display: block; margin-top: 10px; }
+input, select { padding: 5px; margin-top: 5px; width: 200px; }
+button { margin-top: 10px; padding: 5px 10px; }
+.label-grid { display: grid; gap: 10px; margin-top: 20px; }
+.label { border: 1px solid #333; padding: 10px; text-align: center; }
+@media print {
+  body * { visibility: hidden; }
+  .label-grid, .label-grid * { visibility: visible; }
+  .label-grid { position: absolute; top: 0; left: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<h1>Archana Sweets Label Generator</h1>
+
+<label for="productSelect">Select Product:</label>
+<select id="productSelect"></select>
+
+<label for="labelQty">Number of Labels:</label>
+<input type="number" id="labelQty" value="1" min="1">
+
+<label for="mfd">Manufacturing Date:</label>
+<input type="date" id="mfd">
+
+<label for="exp">Expiry Date:</label>
+<input type="date" id="exp">
+
+<label for="columns">Columns per page:</label>
+<input type="number" id="columns" value="2" min="1">
+
+<button id="generateBtn">Generate Labels</button>
+<button onclick="window.print()">Print</button>
+
+<div id="labelContainer" class="label-grid"></div>
+
+<script>
+// Replace with your CSV-published Google Sheet URL
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT8bEliVFGpwxuPKfx5pxXOsiOJzQBhvs5BQTN8OlLvozY7lK24L1tqdVI9MSpIm-IeGeb7rBJh0CN/pub?gid=0&single=true&output=csv';
+
+// Fetch products from CSV
+async function fetchProducts() {
+  try {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const rows = text.split('\n').slice(1); // skip header
+
+    const select = document.getElementById('productSelect');
+    select.innerHTML = '';
+
+    rows.forEach(row => {
+      const [itemName, price, quantity] = row.split(',');
+      if (!itemName) return; // skip empty rows
+      const option = document.createElement('option');
+      option.textContent = ${itemName} (${quantity}) - ₹${price};
+      option.value = itemName;
+      option.dataset.price = price;
+      option.dataset.quantity = quantity;
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    alert('Failed to load products. Make sure the sheet is published as CSV and publicly accessible.');
+  }
+}
+
+// Generate labels
+function generateLabels() {
+  const select = document.getElementById('productSelect');
+  const option = select.options[select.selectedIndex];
+  const itemName = option.value;
+  const quantity = option.dataset.quantity;
+  const price = option.dataset.price;
+  const qty = parseInt(document.getElementById('labelQty').value);
+  const mfd = document.getElementById('mfd').value;
+  const exp = document.getElementById('exp').value;
+  const columns = parseInt(document.getElementById('columns').value);
+
+  const container = document.getElementById('labelContainer');
+  container.innerHTML = '';
+  container.style.gridTemplateColumns = repeat(${columns}, 1fr);
+
+  for(let i=0; i<qty; i++){
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.innerHTML = `
+      <strong>Archana Sweets & Bakery</strong><br>
+      <strong>${itemName}</strong><br>
+      Quantity: ${quantity}<br>
+      Price: ₹${price}<br>
+      MFD: ${mfd}<br>
+      EXP: ${exp}
+    `;
+    container.appendChild(label);
+  }
+}
+
+document.getElementById('generateBtn').addEventListener('click', generateLabels);
+fetchProducts();
+</script>
+
+</body>
+</html>
