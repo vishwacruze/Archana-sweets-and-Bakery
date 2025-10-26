@@ -42,20 +42,22 @@ button { margin-top: 10px; padding: 5px 10px; }
 <div id="labelContainer" class="label-grid"></div>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQT8bEliVFGpwxuPKfx5pxXOsiOJzQBhvs5BQTN8OlLvozY7lK24L1tqdVI9MSpIm-IeGeb7rBJh0CN/pub?output=csv";
+// Replace with your CSV-published Google Sheet URL
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT8bEliVFGpwxuPKfx5pxXOsiOJzQBhvs5BQTN8OlLvozY7lK24L1tqdVI9MSpIm-IeGeb7rBJh0CN/pub?gid=0&single=true&output=csv';
 
+// Fetch products from CSV
 async function fetchProducts() {
   try {
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    const rows = text.split('\n').slice(1);
+    const rows = text.split('\n').slice(1); // skip header
 
     const select = document.getElementById('productSelect');
     select.innerHTML = '';
 
     rows.forEach(row => {
       const [itemName, price, quantity] = row.split(',');
-      if (!itemName) return;
+      if (!itemName) return; // skip empty rows
       const option = document.createElement('option');
       option.textContent = ${itemName} (${quantity}) - ₹${price};
       option.value = itemName;
@@ -65,10 +67,11 @@ async function fetchProducts() {
     });
   } catch (error) {
     console.error('Error fetching products:', error);
-    alert('⚠️ Failed to load products. Make sure the sheet is published as CSV and publicly accessible.');
+    alert('Failed to load products. Make sure the sheet is published as CSV and publicly accessible.');
   }
 }
 
+// Generate labels
 function generateLabels() {
   const select = document.getElementById('productSelect');
   const option = select.options[select.selectedIndex];
@@ -84,7 +87,7 @@ function generateLabels() {
   container.innerHTML = '';
   container.style.gridTemplateColumns = repeat(${columns}, 1fr);
 
-  for (let i = 0; i < qty; i++) {
+  for(let i=0; i<qty; i++){
     const label = document.createElement('div');
     label.className = 'label';
     label.innerHTML = `
