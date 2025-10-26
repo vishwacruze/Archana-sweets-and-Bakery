@@ -43,8 +43,7 @@ button { margin-top: 10px; padding: 5px 10px; }
 
 <script>
 // Replace with your CSV-published Google Sheet URL
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT8bEliVFGpwxuPKfx5pxXOsiOJzQBhvs5BQTN8OlLvozY7lK24L1tqdVI9MSpIm-IeGeb7rBJh0CN/pub?output=csv';
-
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQT8bEliVFGpwxuPKfx5pxXOsiOJzQBhvs5BQTN8OlLvozY7lK24L1tqdVI9MSpIm-IeGeb7rBJh0CN/pub?output=csv";
 // Fetch products from CSV
 async function fetchProducts() {
   try {
@@ -59,7 +58,7 @@ async function fetchProducts() {
       const [itemName, price, quantity] = row.split(',');
       if (!itemName) return; // skip empty rows
       const option = document.createElement('option');
-      option.textContent = ${itemName} (${quantity}) - ₹${price};
+      option.textContent = '${itemName} (${quantity}) - ₹${price}';
       option.value = itemName;
       option.dataset.price = price;
       option.dataset.quantity = quantity;
